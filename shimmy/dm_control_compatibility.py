@@ -112,6 +112,14 @@ class DmControlCompatibilityV0(gymnasium.Env[ObsType, np.ndarray], EzPickle):
         timestep = self._env.reset()
         obs, reward, terminated, truncated, info = dm_env_step2gym_step(timestep)
 
+        #Update the information dictionary further, if Task has one
+        try:
+            extra_info = self._env.task.get_info(self._env.physics)
+        except:
+            extra_info = {}
+        
+        info.update(extra_info)
+
         if self.render_mode == "human":
             self.viewer.close()
             self.viewer = MujocoRenderer(
@@ -127,6 +135,13 @@ class DmControlCompatibilityV0(gymnasium.Env[ObsType, np.ndarray], EzPickle):
         timestep = self._env.step(action)
 
         obs, reward, terminated, truncated, info = dm_env_step2gym_step(timestep)
+        #Update the information dictionary further, if Task has one
+        try:
+            extra_info = self._env.task.get_info(self._env.physics)
+        except:
+            extra_info = {}
+        
+        info.update(extra_info)
 
         if self.render_mode == "human":
             self.viewer.render(self.render_mode)
