@@ -112,10 +112,14 @@ class DmControlCompatibilityV0(gymnasium.Env[ObsType, np.ndarray], EzPickle):
         timestep = self._env.reset()
         obs, reward, terminated, truncated, info = dm_env_step2gym_step(timestep)
 
-        #Update the information dictionary further, if Task has one
+        # Update the information dictionary further, if Task has get_info method
         try:
-            extra_info = self._env.task.get_info(self._env.physics)
-        except:
+            if hasattr(self._env.task, 'get_info'):
+                extra_info = self._env.task.get_info(self._env.physics)
+            else:
+                extra_info = {}
+        except Exception as e:
+            print(f"An error occurred while retrieving extra info: {e}")
             extra_info = {}
         
         info.update(extra_info)
@@ -135,10 +139,14 @@ class DmControlCompatibilityV0(gymnasium.Env[ObsType, np.ndarray], EzPickle):
         timestep = self._env.step(action)
 
         obs, reward, terminated, truncated, info = dm_env_step2gym_step(timestep)
-        #Update the information dictionary further, if Task has one
+        # Update the information dictionary further, if Task has get_info method
         try:
-            extra_info = self._env.task.get_info(self._env.physics)
-        except:
+            if hasattr(self._env.task, 'get_info'):
+                extra_info = self._env.task.get_info(self._env.physics)
+            else:
+                extra_info = {}
+        except Exception as e:
+            print(f"An error occurred while retrieving extra info: {e}")
             extra_info = {}
         
         info.update(extra_info)
