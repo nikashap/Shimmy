@@ -80,7 +80,12 @@ class DmControlCompatibilityV0(gymnasium.Env[ObsType, np.ndarray], EzPickle):
         self.env_type = self._find_env_type(env)
         self.metadata["render_fps"] = self._env.control_timestep() * 1000
 
-        self.observation_space = dm_spec2gym_space(env.observation_spec())
+        obs_spec_keys = env.observation_spec().keys()
+        flat_key = 'observations'
+        if len(obs_spec_keys) == 1 and flat_key in obs_spec_keys:
+            self.observation_space = dm_spec2gym_space(env.observation_spec()[flat_key])
+        else:
+            self.observation_space = dm_spec2gym_space(env.observation_spec())
         self.action_space = dm_spec2gym_space(env.action_spec())
 
         assert render_mode is None or render_mode in self.metadata["render_modes"]
